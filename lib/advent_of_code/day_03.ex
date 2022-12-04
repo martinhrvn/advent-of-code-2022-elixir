@@ -4,7 +4,7 @@ defmodule AdventOfCode.Day03 do
     |> parse_input()
     |> Enum.map(fn line ->
       line
-      |> then(&Enum.split(&1, div(length(&1), 2)))
+      |> split_in_half()
       |> then(fn {a, b} -> intersect(a, b) end)
       |> hd()
       |> get_points()
@@ -19,6 +19,8 @@ defmodule AdventOfCode.Day03 do
     |> Enum.map(fn [a, b, c] -> intersect(a, b) |> intersect(c) |> hd |> get_points end)
     |> Enum.sum()
   end
+
+  defp split_in_half(input), do: Enum.split(input, div(length(input), 2))
 
   defp parse_input(input) do
     input
