@@ -14,12 +14,12 @@ defmodule AdventOfCode.Day05 do
     moves = moves_input |> parse_moves
 
     moves
-    |> Enum.reduce(crates, fn m, crates -> move_multiple(crates, m, flip) end)
+    |> Enum.reduce(crates, fn m, crates -> move_crates(crates, m, flip) end)
     |> Enum.sort()
     |> Enum.map(fn {_, v} -> hd(v) end)
   end
 
-  defp move_multiple(crates, %{from: from, to: to, count: n}, flip) do
+  defp move_crates(crates, %{from: from, to: to, count: n}, flip) do
     c = Map.get(crates, from) |> Enum.take(n)
 
     crates
