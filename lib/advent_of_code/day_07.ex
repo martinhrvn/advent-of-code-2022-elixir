@@ -36,10 +36,10 @@ defmodule AdventOfCode.Day07 do
   defp cmd(line, {tree, curr_path}) do
     case String.split(line, " ") do
       ["dir", name] ->
-        {update_tree(tree, Enum.reverse([name | curr_path]), %{}), curr_path}
+        {put_in(tree, Enum.reverse([name | curr_path]), %{}), curr_path}
 
       [size, name] ->
-        {update_tree(tree, Enum.reverse([name | curr_path]), String.to_integer(size)), curr_path}
+        {put_in(tree, Enum.reverse([name | curr_path]), String.to_integer(size)), curr_path}
 
       _ ->
         {tree, curr_path}
@@ -67,13 +67,5 @@ defmodule AdventOfCode.Day07 do
     list
     |> Enum.map(fn {_, v, t} -> if type == nil or t == type, do: v, else: 0 end)
     |> Enum.sum()
-  end
-
-  defp update_tree(tree, [], _), do: tree
-  defp update_tree(tree, [last], value), do: Map.update(tree, last, value, fn _ -> value end)
-
-  defp update_tree(tree, [head | tail], value) do
-    tree
-    |> Map.update(head, %{}, fn v -> update_tree(v, tail, value) end)
   end
 end
