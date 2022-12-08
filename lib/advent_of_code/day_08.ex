@@ -24,26 +24,30 @@ defmodule AdventOfCode.Day08 do
     grid_map |> Enum.count(fn {k, _v} -> is_visible?(grid_map, k, {width, height}) end)
   end
 
-  defp are_all_lower?(grid, coordinates, val) do
-    grid
-    |> Map.take(coordinates)
-    |> Enum.all?(fn {_, v} -> v < val end)
-  end
-
-  defp is_visible?(_, {0, _}, _), do: true
-  defp is_visible?(_, {_, 0}, _), do: true
-  defp is_visible?(_, {_, y}, {_, height}) when y == height - 1, do: true
-  defp is_visible?(_, {x, _}, {width, _}) when x == width - 1, do: true
-
   defp is_visible?(grid, {x, y}, {width, height}) do
     val = grid[{x, y}]
-    from_north = are_all_lower?(grid, Enum.map(0..(y - 1), &{x, &1}), val)
-    from_south = are_all_lower?(grid, Enum.map((y + 1)..(height - 1), &{x, &1}), val)
-    from_west = are_all_lower?(grid, Enum.map(0..(x - 1), &{&1, y}), val)
-    from_east = are_all_lower?(grid, Enum.map((x + 1)..(width - 1), &{&1, y}), val)
 
-    from_north or from_south or from_west or from_east
+    [:south, :north, :east, :west]
+    |> Enum.map(fn dir -> get_trees(grid, {x, y}, {width, height}, dir) end)
+    |> Enum.any?(fn trees -> Enum.all?(trees, fn {_, v} -> v < val end) end)
   end
+
+  defp get_trees(_, {_, y}, {_, height}, :south) when y == height - 1, do: []
+  defp get_trees(_, {_, y}, {_, _}, :north) when y == 0, do: []
+  defp get_trees(_, {x, _}, {width, _}, :east) when x == width - 1, do: []
+  defp get_trees(_, {x, _}, {_, _}, :west) when x == 0, do: []
+
+  defp get_trees(grid, {x, y}, {height, _}, :south),
+    do: grid |> Map.take(Enum.map((y + 1)..(height - 1), fn i -> {x, i} end))
+
+  defp get_trees(grid, {x, y}, {_, _}, :north),
+    do: grid |> Map.take(Enum.map(0..(y - 1), fn i -> {x, i} end))
+
+  defp get_trees(grid, {x, y}, {width, _}, :east),
+    do: grid |> Map.take(Enum.map((x + 1)..(width - 1), fn i -> {i, y} end))
+
+  defp get_trees(grid, {x, y}, {_, _}, :west),
+    do: grid |> Map.take(Enum.map(0..(x - 1), fn i -> {i, y} end))
 
   def part2(_args) do
   end
