@@ -27,6 +27,7 @@ defmodule AdventOfCode.Day09 do
     new_tail = calculate_tail(head, {tx, ty})
     IO.inspect(head, label: "head")
     IO.inspect(new_tail, label: "tail")
+    IO.write("----------------\n")
     visited = Map.put(visited, new_tail, true)
     {visited, head, new_tail}
   end
@@ -34,7 +35,6 @@ defmodule AdventOfCode.Day09 do
   defp calculate_tail({hx, hy}, {tx, ty}) do
     dx = hx - tx
     dy = hy - ty
-    # IO.inspect({dx, dy, clamp(dx), clamp(dy)}, label: "diff")
 
     cond do
       abs(dx) < 2 and abs(dy) < 2 -> {tx, ty}
