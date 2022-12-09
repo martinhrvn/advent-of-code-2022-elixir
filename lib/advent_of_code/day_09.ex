@@ -1,5 +1,15 @@
 defmodule AdventOfCode.Day09 do
   def part1(input) do
+    simulate(input, 2)
+  end
+
+  def part2(input) do
+    simulate(input, 10)
+  end
+
+  defp simulate(input, segments) do
+    rope = List.duplicate({0, 0}, segments)
+
     input
     |> String.split("\n", trim: true)
     |> Enum.map(fn line ->
@@ -7,14 +17,11 @@ defmodule AdventOfCode.Day09 do
       {direction, String.to_integer(count)}
     end)
     |> Enum.flat_map(fn {d, c} -> List.duplicate(d, c) end)
-    |> IO.inspect(label: "input")
-    |> Enum.reduce({%{}, {0, 0}, {0, 0}}, fn d, {visited, head, tail} ->
-      move(visited, head, tail, d)
+    |> Enum.reduce({rope, MapSet.new([List.last(rope)])}, fn direction, {rope, visited} ->
+      new_rope = move(rope, direction)
+      {new_rope, MapSet.put(visited, List.last(new_rope))}
     end)
-    |> then(fn {visited, _, _} -> visited |> map_size() end)
-  end
-
-  def part2(_args) do
+    |> then(fn {_, visited} -> visited |> MapSet.size() end)
   end
 
   defp dir("R"), do: {0, 1}
@@ -22,25 +29,28 @@ defmodule AdventOfCode.Day09 do
   defp dir("U"), do: {-1, 0}
   defp dir("D"), do: {1, 0}
 
-  defp move(visited, {hx, hy}, {tx, ty}, d) do
+  defp move([{x, y} | rest], d) do
     {dx, dy} = dir(d)
-    head = {hx + dx, hy + dy}
+    head = {x + dx, y + dy}
 
-    new_tail = calculate_tail(head, {tx, ty})
-    visited = Map.put(visited, new_tail, [])
-    {visited, head, new_tail}
+    move_tails([head | rest])
   end
 
-  defp calculate_tail({hx, hy}, {tx, ty}) do
-    dx = hx - tx
-    dy = hy - ty
+  defp move_tails([head]), do: [head]
 
-    cond do
-      abs(dx) < 2 and abs(dy) < 2 -> {tx, ty}
-      abs(dx) < 2 -> {hx, hy - sign(dy)}
-      abs(dy) < 2 -> {hx - sign(dx), hy}
-      true -> {hx - sign(dx), hy - sign(dy)}
-    end
+  defp move_tails([{hx, hy}, {tx, ty} | _] = rope) when abs(hx - tx) < 2 and abs(hy - ty) < 2,
+    do: rope
+
+  defp move_tails([{hx, hy}, {tx, ty} | rest]) when abs(hx - tx) < 2 do
+    [{hx, hy} | move_tails([{hx, hy - sign(hy - ty)} | rest])]
+  end
+
+  defp move_tails([{hx, hy}, {tx, ty} | rest]) when abs(hy - ty) < 2 do
+    [{hx, hy} | move_tails([{hx - sign(hx - tx), hy} | rest])]
+  end
+
+  defp move_tails([{hx, hy}, {tx, ty} | rest]) do
+    [{hx, hy} | move_tails([{hx - sign(hx - tx), hy - sign(hy - ty)} | rest])]
   end
 
   defp sign(0), do: 0
