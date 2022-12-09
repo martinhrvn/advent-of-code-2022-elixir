@@ -6,11 +6,12 @@ defmodule AdventOfCode.Day09 do
       [direction, count] = line |> String.split(" ", trim: true)
       {direction, String.to_integer(count)}
     end)
-    |> Enum.flat_map(fn {d, c} -> List.duplicate({d, c}, c) end)
-    |> Enum.reduce({%{}, {0, 0}, {0, 0}}, fn {d, _}, {visited, head, tail} ->
-      move(visited, head, tail, dir(d))
+    |> Enum.flat_map(fn {d, c} -> List.duplicate(d, c) end)
+    |> IO.inspect(label: "input")
+    |> Enum.reduce({%{}, {0, 0}, {0, 0}}, fn d, {visited, head, tail} ->
+      move(visited, head, tail, d)
     end)
-    |> then(fn {visited, _, _} -> map_size(visited) end)
+    |> then(fn {visited, _, _} -> visited |> map_size() end)
   end
 
   def part2(_args) do
@@ -18,17 +19,15 @@ defmodule AdventOfCode.Day09 do
 
   defp dir("R"), do: {0, 1}
   defp dir("L"), do: {0, -1}
-  defp dir("U"), do: {1, 0}
-  defp dir("D"), do: {-1, 0}
+  defp dir("U"), do: {-1, 0}
+  defp dir("D"), do: {1, 0}
 
-  defp move(visited, {hx, hy}, {tx, ty}, {dx, dy}) do
+  defp move(visited, {hx, hy}, {tx, ty}, d) do
+    {dx, dy} = dir(d)
     head = {hx + dx, hy + dy}
 
     new_tail = calculate_tail(head, {tx, ty})
-    IO.inspect(head, label: "head")
-    IO.inspect(new_tail, label: "tail")
-    IO.write("----------------\n")
-    visited = Map.put(visited, new_tail, true)
+    visited = Map.put(visited, new_tail, [])
     {visited, head, new_tail}
   end
 
@@ -38,13 +37,13 @@ defmodule AdventOfCode.Day09 do
 
     cond do
       abs(dx) < 2 and abs(dy) < 2 -> {tx, ty}
-      abs(dx) < 2 -> {hx, hy - clamp(dy)}
-      abs(dy) < 2 -> {hx - clamp(dx), hy}
-      true -> {hx - clamp(dx), hy - clamp(dy)}
+      abs(dx) < 2 -> {hx, hy - sign(dy)}
+      abs(dy) < 2 -> {hx - sign(dx), hy}
+      true -> {hx - sign(dx), hy - sign(dy)}
     end
   end
 
-  defp clamp(0), do: 0
-  defp clamp(n) when n > 0, do: 1
-  defp clamp(_), do: -1
+  defp sign(0), do: 0
+  defp sign(n) when n > 0, do: 1
+  defp sign(_), do: -1
 end
