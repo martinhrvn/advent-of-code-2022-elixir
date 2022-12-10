@@ -17,13 +17,12 @@ defmodule AdventOfCode.Day10 do
       chunk
       |> Enum.with_index()
       |> Enum.map(fn
-        {acc_x, idx} when abs(acc_x - idx) < 2 -> 'X'
+        {acc_x, idx} when abs(acc_x - idx) < 2 -> '#'
         _ -> '.'
       end)
       |> Enum.join()
     end)
     |> Enum.join("\n")
-    |> IO.puts()
   end
 
   defp get_cycles(input) do
