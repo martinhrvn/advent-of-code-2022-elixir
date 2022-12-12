@@ -45,9 +45,12 @@ defmodule PathSearch do
             find_path(grid, queue, goal, visited)
           else
             new_path = [node | path]
-            new_neighbors = find_neighbors(grid, node)
-            edges = Enum.map(new_neighbors, fn n -> {new_path, n} end)
-            new_queue = Enum.reduce(edges, queue, fn e, q -> :queue.in(e, q) end)
+
+            new_queue =
+              find_neighbors(grid, node)
+              |> Enum.map(fn n -> {new_path, n} end)
+              |> Enum.reduce(queue, fn e, q -> :queue.in(e, q) end)
+
             new_visited = MapSet.put(visited, node)
             find_path(grid, new_queue, goal, new_visited)
           end
