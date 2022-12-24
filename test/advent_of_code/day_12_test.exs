@@ -17,11 +17,17 @@ defmodule AdventOfCode.Day12Test do
     assert result == 31
   end
 
-  @tag :skip
   test "part2" do
-    input = nil
+    input = """
+    Sabqponm
+    abcryxxl
+    accszExk
+    acctuvwj
+    abdefghi
+    """
+
     result = part2(input)
 
-    assert result
+    assert result == 29
   end
 end
